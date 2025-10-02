@@ -81,7 +81,7 @@ export default function Home() {
             <div>Price:</div>
             <div>
               <input
-                name="name"
+                name="price"
                 type="number"
                 {...register("price", { required: true })}
                 className="border border-black w-full"

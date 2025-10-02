@@ -1,6 +1,6 @@
 // app/customers/page.jsx
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 
 export default function CustomersPage() {
@@ -9,7 +9,7 @@ export default function CustomersPage() {
   const base = process.env.NEXT_PUBLIC_API_URL || "";
 
   const load = useCallback(async () => {
-    const res = await fetch(`${base}/api/customers`, { cache: "no-store" });
+  const res = await fetch(`${base}/customers`, { cache: "no-store" });
     const data = await res.json();
     setRows(data);
   }, [base]);
@@ -18,7 +18,7 @@ export default function CustomersPage() {
 
   async function onCreate(e) {
     e.preventDefault();
-    await fetch(`${base}/api/customers`, {
+  await fetch(`${base}/customers`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -33,7 +33,7 @@ export default function CustomersPage() {
   }
 
   async function onDelete(id) {
-    await fetch(`${base}/api/customers/${id}`, { method: "DELETE" });
+  await fetch(`${base}/customers/${id}`, { method: "DELETE" });
     load();
   }
 

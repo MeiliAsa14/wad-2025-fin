@@ -1,7 +1,7 @@
 // app/customers/[id]/page.jsx
 async function getCustomer(id) {
   const base = process.env.NEXT_PUBLIC_API_URL || "";
-  const res = await fetch(`${base}/api/customers/${id}`, { cache: "no-store" });
+  const res = await fetch(`${base}/customers/${id}`, { cache: "no-store" });
   if (!res.ok) return null;
   return res.json();
 }

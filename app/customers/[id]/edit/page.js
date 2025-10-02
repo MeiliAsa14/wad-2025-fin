@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 export default function EditCustomer({ params }) {
   const router = useRouter();
   const [form, setForm] = useState({ name:"", dateOfBirth:"", memberNumber:"", interests:"" });
-  const base = process.env.NEXT_PUBLIC_API_URL || "";
+  let base = process.env.NEXT_PUBLIC_API_URL || "";
+  if (base.endsWith("/")) base = base.slice(0, -1);
 
   useEffect(() => {
     (async () => {
-      const res = await fetch(`${base}/api/customers/${params.id}`);
+  const res = await fetch(`${base}/customers/${params.id}`);
       const c = await res.json();
       setForm({
         name: c.name,
@@ -23,7 +24,14 @@ export default function EditCustomer({ params }) {
 
   async function onSave(e) {
     e.preventDefault();
-    await fetch(`${base}/api/customers/${params.id}`, {
+  let url = `${base}/customers/${params.id}`;
+  // If base is relative (starts with /), make it absolute for server-side fetches
+  if (typeof window === 'undefined' && url.startsWith('/')) {
+    url = `http://localhost:3007${url}`;
+  } else if (url.startsWith('//')) {
+    url = url.replace('//', '/');
+  }
+  await fetch(url, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

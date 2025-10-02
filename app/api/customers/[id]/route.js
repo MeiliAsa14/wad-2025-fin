@@ -1,11 +1,13 @@
 // app/api/customers/[id]/route.js
+
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/mongodb";
+import dbConnect from "@/lib/db";
 import Customer from "@/models/Customer";
 import mongoose from "mongoose";
 
+
 export async function GET(_req, { params }) {
-  await connectDB();
+  await dbConnect();
   if (!mongoose.isValidObjectId(params.id)) {
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
@@ -14,9 +16,10 @@ export async function GET(_req, { params }) {
   return NextResponse.json(doc);
 }
 
+
 export async function PUT(req, { params }) {
   try {
-    await connectDB();
+    await dbConnect();
     const payload = await req.json();
     const updated = await Customer.findByIdAndUpdate(params.id, payload, {
       new: true,
@@ -29,8 +32,9 @@ export async function PUT(req, { params }) {
   }
 }
 
+
 export async function DELETE(_req, { params }) {
-  await connectDB();
+  await dbConnect();
   const deleted = await Customer.findByIdAndDelete(params.id);
   if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json({ ok: true });
