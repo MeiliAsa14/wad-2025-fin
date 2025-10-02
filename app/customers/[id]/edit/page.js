@@ -1,0 +1,54 @@
+// app/customers/[id]/edit/page.jsx
+"use client";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function EditCustomer({ params }) {
+  const router = useRouter();
+  const [form, setForm] = useState({ name:"", dateOfBirth:"", memberNumber:"", interests:"" });
+  const base = process.env.NEXT_PUBLIC_API_URL || "";
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch(`${base}/api/customers/${params.id}`);
+      const c = await res.json();
+      setForm({
+        name: c.name,
+        dateOfBirth: new Date(c.dateOfBirth).toISOString().substring(0,10),
+        memberNumber: c.memberNumber,
+        interests: c.interests,
+      });
+    })();
+  }, [params.id, base]);
+
+  async function onSave(e) {
+    e.preventDefault();
+    await fetch(`${base}/api/customers/${params.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...form,
+        memberNumber: Number(form.memberNumber),
+        dateOfBirth: new Date(form.dateOfBirth)
+      }),
+    });
+    router.push(`/customers/${params.id}`);
+  }
+
+  return (
+    <main className="p-6 max-w-xl mx-auto">
+      <h1 className="text-2xl font-semibold mb-4">Edit Customer</h1>
+      <form onSubmit={onSave} className="grid gap-3">
+        <input className="border p-2 rounded" value={form.name}
+          onChange={e=>setForm({...form, name:e.target.value})}/>
+        <input type="date" className="border p-2 rounded" value={form.dateOfBirth}
+          onChange={e=>setForm({...form, dateOfBirth:e.target.value})}/>
+        <input type="number" min="1" className="border p-2 rounded" value={form.memberNumber}
+          onChange={e=>setForm({...form, memberNumber:e.target.value})}/>
+        <input className="border p-2 rounded" value={form.interests}
+          onChange={e=>setForm({...form, interests:e.target.value})}/>
+        <button className="border rounded px-3 py-2">Save</button>
+      </form>
+    </main>
+  );
+}
